@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calico-typha
+spec:
+  # Number of Typha replicas.  To enable Typha, set this to a non-zero value *and* set the
+  # typha_service_name variable in the calico-config ConfigMap above.
+  #
+  # We recommend using Typha if you have more than 50 nodes.  Above 100 nodes it is essential
+  # (when using the Kubernetes datastore).  Use one replica for every 100-200 nodes.  In
+  # production, we recommend running at least 3 replicas to reduce the impact of rolling upgrade.
+  replicas: 2
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      annotations:
+        # This, along with the CriticalAddonsOnly toleration below, marks the pod as a critical
+        # add-on, ensuring it gets priority scheduling and that its resources are reserved
+        # if it ever gets evicted.
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+        cluster-autoscaler.kubernetes.io/safe-to-evict: 'true'
+        fluentbit.io/exclude: 'true'
+    spec:
+      containers:
+        - name: calico-typha
+          env:
+            # Enable "info" logging by default.  Can be set to "debug" to increase verbosity.
+            - name: TYPHA_LOGSEVERITYSCREEN
+              value: 'Warning'
+            # When using host-local IPAM with the Kubernetes API datastore, you must configure
+            # both calico/node and the Typha deployemt to use the Node.podCIDR field by setting
+            # the environment variable USE_POD_CIDR=true in each
+            - name: USE_POD_CIDR
+              value: 'true'
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: calico-node
+spec:
+  template:
+    metadata:
+      annotations:
+        # This, along with the CriticalAddonsOnly toleration below,
+        # marks the pod as a critical add-on, ensuring it gets
+        # priority scheduling and that its resources are reserved
+        # if it ever gets evicted.
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+        fluentbit.io/exclude: 'true'
+    spec:
+      containers:
+        - name: calico-node
+          env:
+            # Enable IP-in-IP within Felix.
+            - name: FELIX_IPINIPENABLED
+              value: 'true'
+            - name: FELIX_EXTERNALNODESCIDRLIST
+              value: '10.22.22.0/24'
+            # The default IPv4 pool to create on startup if none exists. Pod IPs will be
+            # chosen from this range. Changing this value after installation will have
+            # no effect. This should fall within `--cluster-cidr`.
+            - name: CALICO_IPV4POOL_CIDR
+              value: '10.2.0.0/16'
+            # When using host-local IPAM with the Kubernetes API datastore, you must configure
+            # both calico/node and the Typha deployemt to use the Node.podCIDR field by setting
+            # the environment variable USE_POD_CIDR=true in each
+            - name: USE_POD_CIDR
+              value: 'true'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calico-kube-controllers
+spec:
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
