@@ -143,6 +143,8 @@ spec:
     plural: bgppeers
     singular: bgppeer
   scope: Cluster
+  # https://github.com/projectcalico/calico/issues/4237#issuecomment-737891702
+  preserveUnknownFields: false
   versions:
   - name: v1
     schema:
