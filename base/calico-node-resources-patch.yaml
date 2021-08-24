@@ -1,0 +1,16 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: calico-node
+spec:
+  template:
+    spec:
+      containers:
+        - name: calico-node
+          resources:
+            requests:
+              cpu: 250m
+              memory: 200Mi
+            limits:
+              cpu: 2000m
+              memory: 1Gi
