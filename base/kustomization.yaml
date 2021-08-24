@@ -3,5 +3,4 @@ kind: Kustomization
 resources:
   - calico-typha.yaml
 patchesStrategicMerge:
-  - calico-node-memory-debug-patch.yaml
-  - calico-node-resources-patch.yaml
+  - calico-patch.yaml

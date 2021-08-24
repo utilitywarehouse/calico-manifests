@@ -7,6 +7,10 @@ spec:
     spec:
       containers:
         - name: calico-node
+          env:
+            # Use `sv -w 60 1 felix` inside the container to get a profile
+            - name: FELIX_DebugMemoryProfilePath
+              value: "/tmp/felix-mem.pb.gz"
           resources:
             requests:
               cpu: 250m
