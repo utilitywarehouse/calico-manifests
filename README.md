@@ -1,10 +1,8 @@
-This repository provides [Kustomize][1] base to deploy [Calico][2] using the
-proposed [Typha][3] setup.
+This repository provides [Kustomize][1] base to deploy [Calico][2].
 
-The goal is to have a base to dump calico-typha manifests almost as they come
-via the calico release archives and patch environment specific values
-downstream. That way we could easily compare and identify changes between calico
-releases.
+The goal is to have a base to dump calico manifests almost as they come via the
+calico release archives and patch environment specific values downstream. That
+way we could easily compare and identify changes between calico releases.
 
 Table of Contents
 =================
@@ -17,8 +15,8 @@ Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 ## Upstream
 
-Upstream manifests could be fetched from calico [releases][4] by downloading the
-relevant release archive and looking for `k8s-manifests/calico-typha.yaml` file.
+Upstream manifests could be fetched from calico [releases][3] by downloading the
+relevant release archive and looking for `k8s-manifests/calico.yaml` file.
 A diff between the release archive and the manifests in this repo should be good
 to highlight the upgrade changes.
 
@@ -72,5 +70,4 @@ Where `calico/calico-node-clusterrole-patch.yaml` is:
 
 [1]: https://kustomize.io/
 [2]: https://www.projectcalico.org/
-[3]: https://github.com/projectcalico/typha
-[4]: https://github.com/projectcalico/calico/releases/
+[3]: https://github.com/projectcalico/calico/releases/
