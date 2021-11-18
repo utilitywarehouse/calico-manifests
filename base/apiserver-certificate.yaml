@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: calico-apiserver-selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: calico-apiserver-cert
+spec:
+  dnsNames:
+    - calico-api.kube-system.svc
+    - calico-api.kube-system.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: calico-apiserver-selfsigned-issuer
+  secretName: calico-apiserver-certs
