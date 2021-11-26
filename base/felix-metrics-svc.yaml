@@ -1,0 +1,16 @@
+# Calico proposes creating a service to pull metrics from calico-node:
+# https://docs.projectcalico.org/maintenance/monitor/monitor-component-metrics
+apiVersion: v1
+kind: Service
+metadata:
+  name: felix-metrics-svc
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "9091"
+spec:
+  selector:
+    k8s-app: calico-node
+  ports:
+    - port: 9091
+      targetPort: 9091
