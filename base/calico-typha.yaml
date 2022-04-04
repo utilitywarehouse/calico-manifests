@@ -2476,8 +2476,8 @@ spec:
                   from this pool.
                 type: boolean
               disableBGPExport:
-                description: 'Disable exporting routes from this IP Pool’s CIDR over
-                  BGP. [Default: false]'
+                description: "Disable exporting routes from this IP Pool's CIDR over
+                  BGP. [Default: false]"
                 type: boolean
               ipip:
                 description: 'Deprecated: this field is only used for APIv1 backwards
@@ -4042,7 +4042,7 @@ spec:
       securityContext:
         fsGroup: 65534
       containers:
-      - image: docker.io/calico/typha:v3.21.3
+      - image: docker.io/calico/typha:v3.22.1
         name: calico-typha
         ports:
         - containerPort: 5473
@@ -4155,7 +4155,7 @@ spec:
         # This container installs the CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: docker.io/calico/cni:v3.21.3
+          image: docker.io/calico/cni:v3.22.1
           command: ["/opt/cni/bin/install"]
           envFrom:
           - configMapRef:
@@ -4198,7 +4198,7 @@ spec:
         # container programs network policy and routes on each
         # host.
         - name: calico-node
-          image: docker.io/calico/node:v3.21.3
+          image: docker.io/calico/node:v3.22.1
           envFrom:
           - configMapRef:
               # Allow KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT to be overridden for eBPF mode.
@@ -4412,7 +4412,7 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
         - name: calico-kube-controllers
-          image: docker.io/calico/kube-controllers:v3.21.3
+          image: docker.io/calico/kube-controllers:v3.22.1
           env:
             # Choose which controllers to run.
             - name: ENABLED_CONTROLLERS
