@@ -2476,8 +2476,8 @@ spec:
                   from this pool.
                 type: boolean
               disableBGPExport:
-                description: 'Disable exporting routes from this IP Pool’s CIDR over
-                  BGP. [Default: false]'
+                description: "Disable exporting routes from this IP Pool's CIDR over
+                  BGP. [Default: false]"
                 type: boolean
               ipip:
                 description: 'Deprecated: this field is only used for APIv1 backwards
@@ -4023,7 +4023,7 @@ spec:
         # This container installs the CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: docker.io/calico/cni:v3.21.4
+          image: docker.io/calico/cni:v3.22.1
           command: ["/opt/cni/bin/install"]
           envFrom:
           - configMapRef:
@@ -4031,6 +4031,17 @@ spec:
               name: kubernetes-services-endpoint
               optional: true
           env:
+            # Overrides for kubernetes API server host/port. Needed in BPF mode.
+            - name: KUBERNETES_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: kubernetes_service_host
+            - name: KUBERNETES_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: kubernetes_service_port
             # Name of the CNI config file to create.
             - name: CNI_CONF_NAME
               value: "10-calico.conflist"
@@ -4066,13 +4077,27 @@ spec:
         # container programs network policy and routes on each
         # host.
         - name: calico-node
-          image: docker.io/calico/node:v3.21.4
+          image: docker.io/calico/node:v3.22.1
           envFrom:
           - configMapRef:
               # Allow KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT to be overridden for eBPF mode.
               name: kubernetes-services-endpoint
               optional: true
           env:
+            # Overrides for kubernetes API server host/port. Needed in BPF mode.
+            - name: KUBERNETES_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: kubernetes_service_host
+            - name: KUBERNETES_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: kubernetes_service_port
+            # Actually enable BPF mode.
+            - name: FELIX_BPFENABLED
+              value: "true"
             # Use Kubernetes API as the backing datastore.
             - name: DATASTORE_TYPE
               value: "kubernetes"
@@ -4096,9 +4121,9 @@ spec:
             # Auto-detect the BGP IP address.
             - name: IP
               value: "autodetect"
-            # Enable IPIP
+            # For best performance, disable IPIP
             - name: CALICO_IPV4POOL_IPIP
-              value: "Always"
+              value: "Never"
             # Enable or Disable VXLAN on the default IP pool.
             - name: CALICO_IPV4POOL_VXLAN
               value: "Never"
@@ -4274,7 +4299,7 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
         - name: calico-kube-controllers
-          image: docker.io/calico/kube-controllers:v3.21.4
+          image: docker.io/calico/kube-controllers:v3.22.1
           env:
             # Choose which controllers to run.
             - name: ENABLED_CONTROLLERS
