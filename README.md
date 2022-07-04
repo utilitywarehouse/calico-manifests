@@ -39,37 +39,6 @@ environment.
 - ConfigMap/calico-config should be defined as a resource downstream, as a patch
   on it would include rewriting the json data anyway. 
 
-## Using PSPs
-
-In case calico is deployed in a cluster that uses pod security policies, the
-calico-node role needs to be patched to include the needed policy. This can be
-achieved via a kustomize json patch.
-In `kustomization.yaml`:
-```
-patchesJson6902:
-  - target:
-      group: rbac.authorization.k8s.io
-      version: v1
-      kind: ClusterRole
-      name: calico-node
-    path: calico/calico-node-clusterrole-patch.yaml
-```
-
-Where `calico/calico-node-clusterrole-patch.yaml` is:
-```
-- op: add
-  path: /rules/0
-  value:
-    apiGroups:
-      - policy
-    resources:
-      - podsecuritypolicies
-    verbs:
-      - use
-    resourceNames:
-      - calico-psp
-```
-
 [1]: https://kustomize.io/
 [2]: https://www.projectcalico.org/
 [3]: https://github.com/projectcalico/typha
