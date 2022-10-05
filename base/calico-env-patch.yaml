@@ -11,3 +11,5 @@ spec:
             # Use `sv -w 60 1 felix` inside the container to get a profile
             - name: FELIX_DebugMemoryProfilePath
               value: "/tmp/felix-mem.pb.gz"
+            - name: IP_AUTODETECTION_METHOD
+              value: kubernetes-internal-ip
