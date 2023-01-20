@@ -36,10 +36,11 @@ spec:
       containers:
       - args:
         - --secure-port=5443
+        - -v=5
         env:
         - name: DATASTORE_TYPE
           value: kubernetes
-        image: calico/apiserver:v3.23.3
+        image: calico/apiserver:v3.25.0
         livenessProbe:
           httpGet:
             path: /version
@@ -70,6 +71,8 @@ spec:
       tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
       volumes:
       - name: calico-apiserver-certs
         secret:
@@ -141,6 +144,7 @@ rules:
   - ipamblocks
   - blockaffinities
   - caliconodestatuses
+  - ipamconfigs
   verbs:
   - get
   - list
@@ -148,6 +152,15 @@ rules:
   - create
   - update
   - delete
+- apiGroups:
+  - policy
+  resourceNames:
+  - calico-apiserver
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
