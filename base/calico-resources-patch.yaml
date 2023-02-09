@@ -2,6 +2,7 @@ kind: DaemonSet
 apiVersion: apps/v1
 metadata:
   name: calico-node
+  namespace: kube-system
 spec:
   template:
     spec:

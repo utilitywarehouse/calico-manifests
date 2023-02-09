@@ -4,10 +4,9 @@ resources:
   - apiserver-certificate.yaml
   - apiserver-pdb.yaml
   - apiserver.yaml
-  - calico-typha.yaml
+  - calico-bpf.yaml
   - felix-metrics-svc.yaml
 patchesStrategicMerge:
   - calico-env-patch.yaml
-  - calico-init-patch.yaml
   - calico-resources-patch.yaml
   - apiserver-patch.yaml
