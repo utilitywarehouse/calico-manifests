@@ -1,7 +1,7 @@
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: calico-node
+  name: calico-node-bpf
   namespace: kube-system
 spec:
   template:

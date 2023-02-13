@@ -4347,14 +4347,14 @@ subjects:
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: calico-node
+  name: calico-node-bpf
   namespace: kube-system
   labels:
-    k8s-app: calico-node
+    k8s-app: calico-node-bpf
 spec:
   selector:
     matchLabels:
-      k8s-app: calico-node
+      k8s-app: calico-node-bpf
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -4362,7 +4362,7 @@ spec:
   template:
     metadata:
       labels:
-        k8s-app: calico-node
+        k8s-app: calico-node-bpf
     spec:
       nodeSelector:
         kubernetes.io/os: linux
