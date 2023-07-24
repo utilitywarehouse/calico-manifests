@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calico-apiserver
+spec:
+  template:
+    spec:
+      containers:
+        - args:
+            - --secure-port=5443
+            - -v=0
