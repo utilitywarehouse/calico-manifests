@@ -1,0 +1,11 @@
+# Run typha on master nodes as part of our core control plan components
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calico-typha
+spec:
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+        role: master

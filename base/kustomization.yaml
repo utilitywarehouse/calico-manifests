@@ -6,9 +6,11 @@ resources:
   - apiserver.yaml
   - calico-typha.yaml
   - felix-metrics-svc.yaml
-patchesStrategicMerge:
-  - apiserver-args.yaml
-  - apiserver-rolling-strategy.yaml
-  - calico-env-patch.yaml
-  - calico-init-patch.yaml
-  - calico-resources-patch.yaml
+patches:
+  - path: apiserver-args.yaml
+  - path: apiserver-rolling-strategy.yaml
+  - path: calico-env-patch.yaml
+  - path: calico-init-patch.yaml
+  - path: calico-resources-patch.yaml
+  - path: calico-typha-node-selector.yaml
+  - path: calico-typha-tolerations.yaml

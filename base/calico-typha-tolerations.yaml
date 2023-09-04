@@ -1,0 +1,18 @@
+# Patch calico-typha Deployment to allow scheduling on all nodes until:
+# https://github.com/projectcalico/calico/pull/7979 is merged/released.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calico-typha
+spec:
+  template:
+    spec:
+      tolerations:
+        # Mark the pod as a critical add-on for rescheduling.
+        - key: CriticalAddonsOnly
+          operator: Exists
+        # Make sure Typha can get scheduled on any nodes.
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
