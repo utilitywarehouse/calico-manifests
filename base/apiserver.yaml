@@ -40,7 +40,7 @@ spec:
         env:
         - name: DATASTORE_TYPE
           value: kubernetes
-        image: calico/apiserver:v3.25.0
+        image: calico/apiserver:v3.26.1
         livenessProbe:
           httpGet:
             path: /version
@@ -137,6 +137,7 @@ rules:
   - networksets
   - bgpconfigurations
   - bgppeers
+  - bgpfilters
   - felixconfigurations
   - kubecontrollersconfigurations
   - ippools
