@@ -13,4 +13,3 @@ patches:
   - path: calico-init-patch.yaml
   - path: calico-resources-patch.yaml
   - path: calico-typha-node-selector.yaml
-  - path: calico-typha-tolerations.yaml
