@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calico-typha
+spec:
+  template:
+    spec:
+      containers:
+        - name: calico-typha
+          env:
+            # Uncomment these lines to enable prometheus metrics. Since Typha is host-networked,
+            # this opens a port on the host, which may need to be secured.
+            - name: TYPHA_PROMETHEUSMETRICSENABLED
+              value: "true"
+            - name: TYPHA_PROMETHEUSMETRICSPORT
+              value: "9093"
