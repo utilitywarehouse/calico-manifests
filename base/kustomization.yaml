@@ -7,8 +7,13 @@ resources:
   - calico-typha.yaml
   - felix-metrics-svc.yaml
 patches:
+  - path: apiserver-apiservice.yaml
   - path: apiserver-args.yaml
+  - path: apiserver-certificate-secret-patch.yaml
+  - path: apiserver-clusterrolebindings.yaml
   - path: apiserver-rolling-strategy.yaml
+  - path: calico-clusterrolebindings.yaml
+  - path: calico-delete-ipam-upgrade.yaml
   - path: calico-env-patch.yaml
   - path: calico-init-patch.yaml
   - path: calico-resources-patch.yaml
