@@ -1,5 +1,5 @@
 # Calico proposes creating a service to pull metrics from calico-node:
-# https://docs.projectcalico.org/maintenance/monitor/monitor-component-metrics
+# https://docs.tigera.io/calico/latest/operations/monitor/monitor-component-metrics#creating-a-service-to-expose-felix-metrics
 apiVersion: v1
 kind: Service
 metadata:
