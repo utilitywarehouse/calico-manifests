@@ -1,0 +1,17 @@
+# Calico proposes creating a service to pull metrics from calico-node:
+# https://docs.tigera.io/calico/latest/operations/monitor/monitor-component-metrics#creating-a-service-to-expose-typha-metrics
+apiVersion: v1
+kind: Service
+metadata:
+  name: typha-metrics-svc
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "9093"
+spec:
+  clusterIP: None
+  selector:
+    k8s-app: calico-typha
+  ports:
+    - port: 9093
+      targetPort: 9093

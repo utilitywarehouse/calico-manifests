@@ -4,6 +4,7 @@ resources:
   - apiserver-certificate.yaml
   - apiserver-pdb.yaml
   - apiserver.yaml
+  - calico-typha-metrics-service.yaml
   - calico-typha.yaml
   - felix-metrics-svc.yaml
 patches:
