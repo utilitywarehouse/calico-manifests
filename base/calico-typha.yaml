@@ -6,7 +6,6 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: calico-kube-controllers
-  namespace: kube-system
   labels:
     k8s-app: calico-kube-controllers
 spec:
@@ -22,7 +21,6 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: calico-typha
-  namespace: kube-system
   labels:
     k8s-app: calico-typha
 spec:
@@ -36,21 +34,18 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: calico-kube-controllers
-  namespace: kube-system
 ---
 # Source: calico/templates/calico-node.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: calico-node
-  namespace: kube-system
 ---
 # Source: calico/templates/calico-node.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: calico-cni-plugin
-  namespace: kube-system
 ---
 # Source: calico/templates/kdd-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
@@ -1019,6 +1014,13 @@ spec:
                   Loose]'
                 pattern: ^(?i)(Disabled|Strict|Loose)?$
                 type: string
+              bpfExcludeCIDRsFromNAT:
+                description: BPFExcludeCIDRsFromNAT is a list of CIDRs that are to
+                  be excluded from NAT resolution so that host can handle them. A
+                  typical usecase is node local DNS cache.
+                items:
+                  type: string
+                type: array
               bpfExtToServiceConnmark:
                 description: 'BPFExtToServiceConnmark in BPF mode, control a 32bit
                   mark that is set on connections from an external client to a local
@@ -4656,7 +4658,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: calico-kube-controllers
-  namespace: kube-system
 ---
 # Source: calico/templates/calico-node-rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -4670,7 +4671,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: calico-node
-  namespace: kube-system
 ---
 # Source: calico/templates/calico-node-rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -4684,7 +4684,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: calico-cni-plugin
-  namespace: kube-system
 ---
 # Source: calico/templates/calico-typha.yaml
 # This manifest creates a Service, which will be backed by Calico's Typha daemon.
@@ -4694,7 +4693,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: calico-typha
-  namespace: kube-system
   labels:
     k8s-app: calico-typha
 spec:
@@ -4747,10 +4745,39 @@ spec:
       terminationGracePeriodSeconds: 0
       priorityClassName: system-node-critical
       initContainers:
+        # This container performs upgrade from host-local IPAM to calico-ipam.
+        # It can be deleted if this is a fresh installation, or if you have already
+        # upgraded to use calico-ipam.
+        - name: upgrade-ipam
+          image: docker.io/calico/cni:v3.27.3
+          imagePullPolicy: IfNotPresent
+          command: ["/opt/cni/bin/calico-ipam", "-upgrade"]
+          envFrom:
+          - configMapRef:
+              # Allow KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT to be overridden for eBPF mode.
+              name: kubernetes-services-endpoint
+              optional: true
+          env:
+            - name: KUBERNETES_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: CALICO_NETWORKING_BACKEND
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: calico_backend
+          volumeMounts:
+            - mountPath: /var/lib/cni/networks
+              name: host-local-net-dir
+            - mountPath: /host/opt/cni/bin
+              name: cni-bin-dir
+          securityContext:
+            privileged: true
         # This container installs the CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: docker.io/calico/cni:v3.27.0
+          image: docker.io/calico/cni:v3.27.3
           imagePullPolicy: IfNotPresent
           command: ["/opt/cni/bin/install"]
           envFrom:
@@ -4793,7 +4820,7 @@ spec:
         # i.e. bpf at /sys/fs/bpf and cgroup2 at /run/calico/cgroup. Calico-node initialisation is executed
         # in best effort fashion, i.e. no failure for errors, to not disrupt pod creation in iptable mode.
         - name: "mount-bpffs"
-          image: docker.io/calico/node:v3.27.0
+          image: docker.io/calico/node:v3.27.3
           imagePullPolicy: IfNotPresent
           command: ["calico-node", "-init", "-best-effort"]
           volumeMounts:
@@ -4819,7 +4846,7 @@ spec:
         # container programs network policy and routes on each
         # host.
         - name: calico-node
-          image: docker.io/calico/node:v3.27.0
+          image: docker.io/calico/node:v3.27.3
           imagePullPolicy: IfNotPresent
           envFrom:
           - configMapRef:
@@ -4897,9 +4924,6 @@ spec:
             # Disable IPv6 on Kubernetes.
             - name: FELIX_IPV6SUPPORT
               value: "false"
-            # Set Felix logging to "info"
-            - name: FELIX_LOGSEVERITYSCREEN
-              value: "info"
             - name: FELIX_HEALTHENABLED
               value: "true"
           securityContext:
@@ -4995,6 +5019,12 @@ spec:
         - name: cni-log-dir
           hostPath:
             path: /var/log/calico/cni
+        # Mount in the directory for host-local IPAM allocations. This is
+        # used when upgrading from host-local to calico-ipam, and can be removed
+        # if not using the upgrade-ipam init container.
+        - name: host-local-net-dir
+          hostPath:
+            path: /var/lib/cni/networks
         # Used to create per-pod Unix Domain Sockets
         - name: policysync
           hostPath:
@@ -5037,7 +5067,7 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
         - name: calico-kube-controllers
-          image: docker.io/calico/kube-controllers:v3.27.0
+          image: docker.io/calico/kube-controllers:v3.27.3
           imagePullPolicy: IfNotPresent
           env:
             # Choose which controllers to run.
@@ -5125,7 +5155,7 @@ spec:
       securityContext:
         fsGroup: 65534
       containers:
-      - image: docker.io/calico/typha:v3.27.0
+      - image: docker.io/calico/typha:v3.27.3
         imagePullPolicy: IfNotPresent
         name: calico-typha
         ports:
@@ -5182,3 +5212,4 @@ spec:
             host: localhost
           periodSeconds: 10
           timeoutSeconds: 10
+---

@@ -1,0 +1,13 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: calico-node
+spec:
+  template:
+    spec:
+      initContainers:
+        - $patch: delete
+          name: upgrade-ipam
+      volumes:
+        - $patch: delete
+          name: host-local-net-dir

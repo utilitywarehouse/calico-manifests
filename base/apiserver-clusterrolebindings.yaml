@@ -1,0 +1,35 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: calico-apiserver-access-crds
+subjects:
+- kind: ServiceAccount
+  name: calico-apiserver
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: calico-apiserver-delegate-auth
+subjects:
+- kind: ServiceAccount
+  name: calico-apiserver
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: calico-apiserver-webhook-reader
+subjects:
+- kind: ServiceAccount
+  name: calico-apiserver
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: calico-extension-apiserver-auth-access
+subjects:
+- kind: ServiceAccount
+  name: calico-apiserver
+  namespace: kube-system
