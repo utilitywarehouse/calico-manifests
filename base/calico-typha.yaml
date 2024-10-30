@@ -5867,10 +5867,20 @@ rules:
       - hostendpoints
       - blockaffinities
       - caliconodestatuses
+    verbs:
+      - get
+      - list
+      - watch
+  # Patch to correct missing upstream permissions for calico-node
+  - apiGroups: ["crd.projectcalico.org"]
+    resources:
       - tiers
     verbs:
       - get
       - list
+      - create
+      - update
+      - delete
       - watch
   # Calico must create and update some CRDs on startup.
   - apiGroups: ["crd.projectcalico.org"]
