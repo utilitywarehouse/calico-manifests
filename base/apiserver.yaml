@@ -43,7 +43,7 @@ spec:
         env:
         - name: DATASTORE_TYPE
           value: kubernetes
-        image: calico/apiserver:v3.29.0
+        image: calico/apiserver:v3.30.0
         name: calico-apiserver
         readinessProbe:
           httpGet:
@@ -179,6 +179,15 @@ rules:
   - clusterrolebindings
   - roles
   - rolebindings
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingadmissionpolicies
+  - validatingadmissionpolicybindings
   verbs:
   - get
   - list
