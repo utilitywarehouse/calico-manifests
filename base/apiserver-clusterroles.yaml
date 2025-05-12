@@ -1,8 +1,0 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: calico-crds
-aggregationRule:
-  clusterRoleSelectors:
-  - matchLabels:
-      rbac.authorization.k8s.io/aggregate-to-calico-crds: "true"
