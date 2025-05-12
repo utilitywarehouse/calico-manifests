@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - apiserver-certificate.yaml
   - apiserver-pdb.yaml
+  - apiserver-rbac-pacth.yaml
   - apiserver.yaml
   - calico-typha-metrics-service.yaml
   - calico-typha.yaml
@@ -12,6 +13,7 @@ patches:
   - path: apiserver-args.yaml
   - path: apiserver-certificate-secret-patch.yaml
   - path: apiserver-clusterrolebindings.yaml
+  - path: apiserver-clusterroles.yaml
   - path: apiserver-rolling-strategy.yaml
   - path: calico-clusterrolebindings.yaml
   - path: calico-delete-ipam-upgrade.yaml
