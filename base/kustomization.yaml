@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - apiserver-certificate.yaml
   - apiserver-pdb.yaml
+  - apiserver-rbac-pacth.yaml
   - apiserver.yaml
   - calico-typha-metrics-service.yaml
   - calico-typha.yaml
