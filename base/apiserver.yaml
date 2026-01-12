@@ -5,10 +5,10 @@ metadata:
   name: calico-api
 spec:
   ports:
-  - name: apiserver
-    port: 443
-    protocol: TCP
-    targetPort: 5443
+    - name: apiserver
+      port: 443
+      protocol: TCP
+      targetPort: 5443
   selector:
     apiserver: "true"
   type: ClusterIP
@@ -37,27 +37,27 @@ spec:
       name: calico-apiserver
     spec:
       containers:
-      - args:
-        - --secure-port=5443
-        - -v=5
-        env:
-        - name: DATASTORE_TYPE
-          value: kubernetes
-        image: calico/apiserver:v3.30.1
-        name: calico-apiserver
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 5443
-            scheme: HTTPS
-          timeoutSeconds: 5
-          periodSeconds: 60
-        securityContext:
-          privileged: false
-          runAsUser: 0
-        volumeMounts:
-        - mountPath: /code/apiserver.local.config/certificates
-          name: calico-apiserver-certs
+        - args:
+            - --secure-port=5443
+            - -v=5
+          env:
+            - name: DATASTORE_TYPE
+              value: kubernetes
+          image: quay.io/calico/apiserver:v3.31.3
+          name: calico-apiserver
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 5443
+              scheme: HTTPS
+            timeoutSeconds: 5
+            periodSeconds: 60
+          securityContext:
+            privileged: false
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /code/apiserver.local.config/certificates
+              name: calico-apiserver-certs
       dnsPolicy: ClusterFirst
       nodeSelector:
         kubernetes.io/os: linux
@@ -65,14 +65,14 @@ spec:
       serviceAccount: calico-apiserver
       serviceAccountName: calico-apiserver
       tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/master
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/control-plane
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
       volumes:
-      - name: calico-apiserver-certs
-        secret:
-          secretName: calico-apiserver-certs
+        - name: calico-apiserver-certs
+          secret:
+            secretName: calico-apiserver-certs
 
 ---
 
@@ -104,56 +104,59 @@ kind: ClusterRole
 metadata:
   name: calico-crds
 rules:
-- apiGroups:
-  - extensions
-  - networking.k8s.io
-  - ""
-  resources:
-  - networkpolicies
-  - nodes
-  - namespaces
-  - pods
-  - serviceaccounts
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - crd.projectcalico.org
-  resources:
-  - globalnetworkpolicies
-  - networkpolicies
-  - clusterinformations
-  - hostendpoints
-  - globalnetworksets
-  - networksets
-  - bgpconfigurations
-  - bgppeers
-  - bgpfilters
-  - felixconfigurations
-  - kubecontrollersconfigurations
-  - ippools
-  - ipreservations
-  - ipamblocks
-  - blockaffinities
-  - caliconodestatuses
-  - ipamconfigs
-  - tiers
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - delete
-- apiGroups:
-  - policy
-  resourceNames:
-  - calico-apiserver
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
+  - apiGroups:
+      - extensions
+      - networking.k8s.io
+      - ""
+    resources:
+      - networkpolicies
+      - nodes
+      - namespaces
+      - pods
+      - serviceaccounts
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - crd.projectcalico.org
+    resources:
+      - globalnetworkpolicies
+      - networkpolicies
+      - clusterinformations
+      - hostendpoints
+      - globalnetworksets
+      - networksets
+      - bgpconfigurations
+      - bgppeers
+      - bgpfilters
+      - felixconfigurations
+      - kubecontrollersconfigurations
+      - ippools
+      - ipreservations
+      - ipamblocks
+      - blockaffinities
+      - caliconodestatuses
+      - ipamconfigs
+      - tiers
+      - stagednetworkpolicies
+      - stagedglobalnetworkpolicies
+      - stagedkubernetesnetworkpolicies
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - policy
+    resourceNames:
+      - calico-apiserver
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
 
 ---
 
@@ -162,56 +165,54 @@ kind: ClusterRole
 metadata:
   name: calico-extension-apiserver-auth-access
 rules:
-- apiGroups:
-  - ""
-  resourceNames:
-  - extension-apiserver-authentication
-  resources:
-  - configmaps
-  verbs:
-  - list
-  - watch
-  - get
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - clusterroles
-  - clusterrolebindings
-  - roles
-  - rolebindings
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - validatingadmissionpolicies
-  - validatingadmissionpolicybindings
-  verbs:
-  - get
-  - list
-  - watch
+  - apiGroups:
+      - ""
+    resourceNames:
+      - extension-apiserver-authentication
+    resources:
+      - configmaps
+    verbs:
+      - list
+      - watch
+      - get
+  - apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - clusterroles
+      - clusterrolebindings
+      - roles
+      - rolebindings
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingadmissionpolicies
+      - validatingadmissionpolicybindings
+    verbs:
+      - get
+      - list
+      - watch
 
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: calico-webhook-reader
 rules:
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - mutatingwebhookconfigurations
-  - validatingwebhookconfigurations
-  verbs:
-  - get
-  - list
-  - watch
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    verbs:
+      - get
+      - list
+      - watch
 
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
